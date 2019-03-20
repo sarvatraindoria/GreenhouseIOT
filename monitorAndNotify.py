@@ -1,0 +1,1 @@
+#cronjob for recording humidity every minute 
