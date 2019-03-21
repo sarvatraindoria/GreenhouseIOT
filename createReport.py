@@ -1,1 +1,0 @@
-#Create a csv file ,Seperate row for each days, checks humid and temp range (ok/Bad)
