@@ -4,7 +4,7 @@ import sqlite3
 from sense_hat import SenseHat
 sense = SenseHat()
 
-class Dbcon:
+class Dbcon():
  
     def createCon(self):
         self.con = sqlite3.connect('a1.db')
@@ -16,7 +16,7 @@ class Dbcon:
         self.cur.execute(q)
         self.con.commit()
         
-class monitorTemp:
+class monitorTemp():
     def __init__(self, upperTemp, lowerTemp, notified):
         self.upperTemp=upperTemp
         self.lowerTemp=lowerTemp
