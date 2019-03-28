@@ -79,6 +79,7 @@ class pushBulletImp():
         devices = p.getDevices()
         p.pushNote(devices[0]["iden"], 'Raspberry-Pi-Notification', msg)
 
+
 class monitorTemp():
     def __init__(self, upperTemp, lowerTemp, notified):
         self.upperTemp = upperTemp

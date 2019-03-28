@@ -3,6 +3,7 @@ import csv
 import pandas as pd
 import os
 import json
+import collections
 
 
 class Dbcon():
@@ -41,7 +42,7 @@ class DataStoreT():
         self.maxTmp = maxTmp
 
 
-class ReadFile_CheckLimit():
+class readCheck():
 
     def readJson(self):
         osp = os.path.realpath(__file__)
@@ -51,7 +52,7 @@ class ReadFile_CheckLimit():
             data = json.load(json_file)
             return data
 
-    def checkLimit(self, val, lowerLim, upperLim):
+    def chkLt(self, val, lowerLim, upperLim):
         if(val < lowerLim):
             return -1, lowerLim - val
         elif(val > upperLim):
@@ -62,8 +63,9 @@ class ReadFile_CheckLimit():
 
 class createReport():
     def exportCSV(self):
-        dataStoreList = {}
-        csvData = [['Date', 'Status']]
+        dsl = {}
+        dsl = collections.OrderedDict(dsl)
+        csvData = []
         myDB = Dbcon()
         cur, con = myDB.createCon()
         df = pd.read_sql_query("""
@@ -72,23 +74,30 @@ class createReport():
                                 from pidata group by date""", con)
 
         for row in range(0, len(df)):
-            dataStoreList.update({df['date'][row]: DataStoreT(df['min(temp)'][row], df['max(temp)'][row], df['min(humid)'][row], df['max(humid)'][row])})
+            mint = df['min(temp)'][row]
+            maxt = df['max(temp)'][row]
+            minh = df['min(humid)'][row]
+            maxh = df['max(humid)'][row]
+            dt = df['date'][row]
+            dsl.update({dt: DataStoreT(mint, maxt, minh, maxh)})
+            print(dt)
 
-        tmin = ReadFile_CheckLimit().readJson()['min_temprature']
-        tmax = ReadFile_CheckLimit().readJson()['max_temprature']
-        hmin = ReadFile_CheckLimit().readJson()['min_humidity']
-        hmax = ReadFile_CheckLimit().readJson()['max_humidity']
-        for i in dataStoreList:
-            status = "OK"
+        tmin = readCheck().readJson()['min_temprature']
+        tmax = readCheck().readJson()['max_temprature']
+        hmin = readCheck().readJson()['min_humidity']
+        hmax = readCheck().readJson()['max_humidity']
+        print("---")
+        for i in dsl:
+            status = "OK : "
             cmnt = ""
+            tresp0, tresp1 = readCheck().chkLt(dsl.get(i).minTmp, tmin, tmax)
             print(i)
-            tresp0, tresp1 = ReadFile_CheckLimit().checkLimit(dataStoreList.get(i).minTmp, tmin, tmax)
 
             if tresp0 == -1:
                 tCmnt = str(tresp1)+" degrees below minimum temprature"
-                status = "BAD"
+                status = "BAD : "
 
-            tresp0, tresp1 = ReadFile_CheckLimit().checkLimit(dataStoreList.get(i).maxTmp, tmin, tmax)
+            tresp0, tresp1 = readCheck().chkLt(dsl.get(i).maxTmp, tmin, tmax)
 
             if tresp0 == 1:
                 tCmnt = str(tresp1)+" degrees above maximum temprature"
@@ -96,9 +105,9 @@ class createReport():
                     cmnt = tCmnt
                 else:
                     cmnt = cmnt + " ; " + tCmnt
-                status = "BAD"
+                status = "BAD : "
 
-            tresp0, tresp1 = ReadFile_CheckLimit().checkLimit(dataStoreList.get(i).minHumid, hmin, hmax)
+            tresp0, tresp1 = readCheck().chkLt(dsl.get(i).minHumid, hmin, hmax)
 
             if tresp0 == -1:
                 tCmnt = str(tresp1)+"% below minimum humidity"
@@ -106,9 +115,9 @@ class createReport():
                     cmnt = tCmnt
                 else:
                     cmnt = cmnt + " ; " + tCmnt
-                status = "BAD"
+                status = "BAD : "
 
-            tresp0, tresp1 = ReadFile_CheckLimit().checkLimit(dataStoreList.get(i).maxHumid, hmin, hmax)
+            tresp0, tresp1 = readCheck().chkLt(dsl.get(i).maxHumid, hmin, hmax)
 
             if tresp0 == 1:
                 tCmnt = str(tresp1)+"% above maximum humidity"
@@ -116,11 +125,12 @@ class createReport():
                     cmnt = tCmnt
                 else:
                     cmnt = cmnt + " ; " + tCmnt
-                status = "BAD"
+                status = "BAD : "
 
-            csvData.append([i, cmnt])
+            csvData.append([i, status + cmnt])
 
-        print(csvData)
+        df = pd.DataFrame(csvData, columns=['Date', 'Status'])
+        df.to_csv("report.csv", sep=',', index=False)
 
 myReport = createReport()
 myReport.exportCSV()
