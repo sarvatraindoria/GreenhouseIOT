@@ -148,7 +148,7 @@ class maindriver():
         humid = hresp[0]
         noti = 0
         if flag is True:
-            cmnt=""
+            cmnt = ""
 
         if hresp[2] == 1:
             hCmnt = str(hresp[1])+"% above maximum humidity"
