@@ -83,11 +83,7 @@ class Blconnect():
                 print("Found device with names: ", botList)
                 p.pushNote(devices[0]["iden"], 'Raspberry-Pi-Notification','Current Temperature is :'+str(ct)+'Degrees'+'\nCurrentHumid :'+str(ch)+'%'+'\n'+ msg)
                 break
-            # else :
-            #     print("Device not found")
-                
-            #     print (i," Loop cycle out of 9 ")
-            #     i +=1
+            
            
          
 
