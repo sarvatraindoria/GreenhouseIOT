@@ -3,6 +3,7 @@ import os
 import time
 import subprocess
 from pushbullet.pushbullet import PushBullet
+import monitorAndNotify as util
 
 from sense_hat import SenseHat
 # apiKey = "o.UPscOoahFXH2SOglsP5MICsJSywOOlqr"
@@ -37,22 +38,31 @@ from sense_hat import SenseHat
 
 
 class Blconnect():
-    # def __init__(self, botList, iP):
-    #     self.botList = botList
-    #     self.iP = iP
-
-        
+      
     def detect(self):
         while True:
             print("Scanning...")
             nearbyDevices = bluetooth.discover_devices(lookup_names=True)
-
-            for  name in nearbyDevices:
-                print("Found device with mac-address: ", name)
-                
+            
+            for name in nearbyDevices:
+                print(name)
                 return name
 
 
+    def blueMsg(self):
+        data = util.maindriver().collectStoreNotify(True)
+        tmin = util.maindriver().readJson()['min_temprature']
+        tmax = util.maindriver().readJson()['max_temprature']
+        hmin = util.maindriver().readJson()['min_humidity']
+        hmax = util.maindriver().readJson()['max_humidity']
+
+        currentTemp, _, _ = util.monitorTemp(tmax, tmin, 0).checkTemp()
+        
+        currentHumid, _, _ = util.Humid(hmax, hmin, 0).humidity()
+        
+        print(data)
+        return data,currentTemp,currentHumid
+    
 
 
     def connect(self):
@@ -61,12 +71,23 @@ class Blconnect():
         p = PushBullet(apiKey)
         # Get a list of devices
         devices = p.getDevices()
-        botList=self.detect()
+        
+        msg, ct, ch = self.blueMsg()
 
-        devices = p.getDevices()
-
-        if devices[0].get("nickname") in botList:
-            p.pushNote(devices[0]["iden"], 'Raspberry-Pi-Notification','hello')
+        
+        while True:
+            botList=self.detect()
+            print(botList)
+            if devices[0].get("nickname") in botList:
+                
+                print("Found device with names: ", botList)
+                p.pushNote(devices[0]["iden"], 'Raspberry-Pi-Notification','Current Temperature is :'+str(ct)+'Degrees'+'\nCurrentHumid :'+str(ch)+'%'+'\n'+ msg)
+                break
+            # else :
+            #     print("Device not found")
+                
+            #     print (i," Loop cycle out of 9 ")
+            #     i +=1
            
          
 

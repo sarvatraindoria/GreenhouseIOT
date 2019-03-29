@@ -10,7 +10,7 @@ sense = SenseHat()
 sense.clear()
 
 
-class Humid ():
+class Humid():
     def __init__(self, maxHumid, minHumid, notified):
         self.minHumid = minHumid
         self.maxHumid = maxHumid
@@ -132,7 +132,7 @@ class maindriver():
         myPB = pushBulletImp()
         myPB.sendNotify(msg)
 
-    def collectStoreNotify(self):
+    def collectStoreNotify(self, flag=False):
         tmin = self.readJson()['min_temprature']
         tmax = self.readJson()['max_temprature']
         tobj = monitorTemp(tmax, tmin, 0)
@@ -147,42 +147,51 @@ class maindriver():
         tmp = tresp[0]
         humid = hresp[0]
         noti = 0
+        if flag == True:
+            cmnt=""
 
         if hresp[2] == 1:
             hCmnt = str(hresp[1])+"% above maximum humidity"
             cmnt = hCmnt
-            dbx = Dbcon()
-            dbx.executeQuery(q, tmp, humid, date, time, noti)
-            if self.getNotified() is False:
-                self.doNotify(cmnt+" on date:"+date+" time:"+time)
+            if flag == False:
+                dbx = Dbcon()
+                if self.getNotified() is False:
+                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
 
         elif hresp[2] == -1:
             hCmnt = str(hresp[1])+"% below minimum humidity"
             cmnt = hCmnt
-            dbx = Dbcon()
-            dbx.executeQuery(q, tmp, humid, date, time, noti)
-            if self.getNotified() is False:
-                self.doNotify(cmnt+" on date:"+date+" time:"+time)
+            if flag == False:
+                dbx = Dbcon()
+                dbx.executeQuery(q, tmp, humid, date, time, noti)
+                if self.getNotified() is False:
+                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
 
         elif tresp[2] == 1:
             tCmnt = str(tresp[1])+" degrees above maximum temprature"
             cmnt = tCmnt
-            dbx = Dbcon()
-            dbx.executeQuery(q, tmp, humid, date, time, noti)
-            if self.getNotified() is False:
-                self.doNotify(cmnt+" on date:"+date+" time:"+time)
+            if flag == False:
+                dbx = Dbcon()
+                dbx.executeQuery(q, tmp, humid, date, time, noti)
+                if self.getNotified() is False:
+                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
 
         elif tresp[2] == -1:
             tCmnt = str(tresp[1])+" degrees below minimum temprature"
             cmnt = tCmnt
-            dbx = Dbcon()
-            dbx.executeQuery(q, tmp, humid, date, time, noti)
-            if self.getNotified() is False:
-                self.doNotify(cmnt+" on date:"+date+" time:"+time)
+            if flag == False:
+                dbx = Dbcon()
+                dbx.executeQuery(q, tmp, humid, date, time, noti)
+                if self.getNotified() is False:
+                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
 
         else:
-            dbx = Dbcon()
-            dbx.executeQuery(q, tmp, humid, date, time, noti)
+            if flag == False:
+                dbx = Dbcon()
+                dbx.executeQuery(q, tmp, humid, date, time, noti)
+
+        if flag == True:
+            return cmnt
 
 p = maindriver()
 p.collectStoreNotify()
