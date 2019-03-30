@@ -1,7 +1,6 @@
 import bluetooth
 import os
 import time
-import subprocess
 from pushbullet.pushbullet import PushBullet
 import monitorAndNotify as util
 
