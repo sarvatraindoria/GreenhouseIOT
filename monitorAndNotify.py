@@ -35,7 +35,7 @@ class Humid():
                 print("humidity is : ", humid)
                 return originalHumid, humid, checker
 
-        except:
+        except BaseException:
             print("error")
             sense.show_message("error")
 
@@ -46,7 +46,7 @@ class Dbcon():
         osp = os.path.realpath(__file__)
         bsp = os.path.basename(__file__)
         relPath = osp.replace(bsp, "")
-        self.con = sqlite3.connect(relPath+'a1.db')
+        self.con = sqlite3.connect(relPath + 'a1.db')
         self.cur = self.con.cursor()
         self.cur.execute('''CREATE TABLE IF NOT EXISTS 'pidata'
         ('temp'	REAL NOT NULL,'humid'
@@ -99,7 +99,7 @@ class monitorTemp():
     def checkTemp(self):
         tempTemp = sense.get_temperature_from_humidity()
         temp_cpu = self.get_cpu_temprature()
-        temp_cor = tempTemp - ((temp_cpu-tempTemp)/1.5)
+        temp_cor = tempTemp - ((temp_cpu - tempTemp) / 1.5)
         if self.upperTemp < temp_cor:
             return round(temp_cor, 1), round(temp_cor-self.upperTemp, 1), 1
         elif temp_cor < self.lowerTemp:
@@ -114,7 +114,7 @@ class maindriver():
         osp = os.path.realpath(__file__)
         bsp = os.path.basename(__file__)
         relPath = osp.replace(bsp, "")
-        with open(relPath+'config.json') as json_file:
+        with open(relPath + 'config.json') as json_file:
             data = json.load(json_file)
             return data
 
@@ -156,39 +156,39 @@ class maindriver():
             cmnt = ""
 
         if hresp[2] == 1:
-            hCmnt = str(hresp[1])+"% above maximum humidity"
+            hCmnt = str(hresp[1]) + "% above maximum humidity"
             cmnt = hCmnt
             if flag is False:
                 dbx = Dbcon()
                 if self.getNotified() is False:
-                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
+                    self.doNotify(cmnt + " on date:" + date + " time:" + time)
 
         elif hresp[2] == -1:
-            hCmnt = str(hresp[1])+"% below minimum humidity"
+            hCmnt = str(hresp[1]) + "% below minimum humidity"
             cmnt = hCmnt
             if flag is False:
                 dbx = Dbcon()
                 dbx.executeQuery(q, tmp, humid, date, time, noti)
                 if self.getNotified() is False:
-                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
+                    self.doNotify(cmnt + " on date:" + date + " time:" + time)
 
         elif tresp[2] == 1:
-            tCmnt = str(tresp[1])+" degrees above maximum temprature"
+            tCmnt = str(tresp[1]) + " degrees above maximum temprature"
             cmnt = tCmnt
             if flag is False:
                 dbx = Dbcon()
                 dbx.executeQuery(q, tmp, humid, date, time, noti)
                 if self.getNotified() is False:
-                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
+                    self.doNotify(cmnt + " on date:" + date + " time:" + time)
 
         elif tresp[2] == -1:
-            tCmnt = str(tresp[1])+" degrees below minimum temprature"
+            tCmnt = str(tresp[1]) + " degrees below minimum temprature"
             cmnt = tCmnt
             if flag is False:
                 dbx = Dbcon()
                 dbx.executeQuery(q, tmp, humid, date, time, noti)
                 if self.getNotified() is False:
-                    self.doNotify(cmnt+" on date:"+date+" time:"+time)
+                    self.doNotify(cmnt + " on date:" + date + " time:" + time)
 
         else:
             if flag is False:
@@ -197,6 +197,7 @@ class maindriver():
 
         if flag is True:
             return cmnt
+
 
 p = maindriver()
 p.collectStoreNotify()
