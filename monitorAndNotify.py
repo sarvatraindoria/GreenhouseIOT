@@ -48,7 +48,12 @@ class Dbcon():
         relPath = osp.replace(bsp, "")
         self.con = sqlite3.connect(relPath+'a1.db')
         self.cur = self.con.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS 'pidata' ('temp'	REAL NOT NULL,'humid'	REAL NOT NULL,'date'	TEXT NOT NULL,'time'	TEXT NOT NULL,'notified'	INTEGER NOT NULL);")
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS 'pidata'
+        ('temp'	REAL NOT NULL,'humid'
+        REAL NOT NULL,'date'
+        TEXT NOT NULL,'time'
+        TEXT NOT NULL,'notified'
+        INTEGER NOT NULL);''')
         return self.cur, self.con
 
     def executeQuery(self, q, tmp, humid, date, time, notify):
@@ -96,11 +101,11 @@ class monitorTemp():
         temp_cpu = self.get_cpu_temprature()
         temp_cor = tempTemp - ((temp_cpu-tempTemp)/1.5)
         if self.upperTemp < temp_cor:
-            return round(temp_cor), round(temp_cor-self.upperTemp), 1
+            return round(temp_cor, 1), round(temp_cor-self.upperTemp, 1), 1
         elif temp_cor < self.lowerTemp:
-            return round(temp_cor), round(self.lowerTemp-temp_cor), -1
+            return round(temp_cor, 1), round(self.lowerTemp-temp_cor, 1), -1
         else:
-            return round(temp_cor), 0, 0
+            return round(temp_cor, 1), 0, 0
 
 
 class maindriver():
