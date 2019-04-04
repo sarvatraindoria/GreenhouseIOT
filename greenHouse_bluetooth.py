@@ -42,7 +42,6 @@ class Blconnect():
 # Connect funtion will use pushBullet apikey in order to use pushbullet library
 
     def connect(self):
-
         apiKey = "o.2uIo9r0MKCCFX8Mv3uMhp4xOXE9vgBrC"
         p = PushBullet(apiKey)
         # Get a list of devices
