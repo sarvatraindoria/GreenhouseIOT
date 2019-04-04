@@ -40,7 +40,6 @@ class CreateAnalyticsBar():
         plot.savefig('bar.png')
 
 
-
 class CreateAnalyticsScatter():
         def geberateScatter(self):
                 # DB connection and data retrival
@@ -97,3 +96,4 @@ class CreateAnalyticsScatter():
                 xy_chart.render_to_png('scatter.png')
 
 CreateAnalyticsScatter().geberateScatter()
+CreateAnalyticsBar().generateBar()
