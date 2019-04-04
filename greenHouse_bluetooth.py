@@ -5,7 +5,7 @@ from pushbullet.pushbullet import PushBullet
 import monitorAndNotify as util
 
 from sense_hat import SenseHat
-# apiKey = "o.UPscOoahFXH2SOglsP5MICsJSywOOlqr"
+# apiKey = "o.2uIo9r0MKCCFX8Mv3uMhp4xOXE9vgBrCr"
 
 
 class Blconnect():
@@ -35,7 +35,7 @@ class Blconnect():
 
     def connect(self):
 
-        apiKey = "o.UPscOoahFXH2SOglsP5MICsJSywOOlqr"
+        apiKey = "o.2uIo9r0MKCCFX8Mv3uMhp4xOXE9vgBrC"
         p = PushBullet(apiKey)
         # Get a list of devices
         devices = p.getDevices()
