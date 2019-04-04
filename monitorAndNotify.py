@@ -1,4 +1,3 @@
-import logging
 from sense_hat import SenseHat
 import datetime
 import sqlite3
@@ -17,6 +16,7 @@ class Humid():
         self.notified = notified
 
     def humidity(self):
+        # Humidity data collection and check
         humid = round(sense.get_humidity())
         checker = 0
         try:
@@ -43,11 +43,19 @@ class Humid():
 class Dbcon():
 
     def createCon(self):
-        osp = os.path.realpath(__file__)
-        bsp = os.path.basename(__file__)
-        relPath = osp.replace(bsp, "")
-        self.con = sqlite3.connect(relPath + 'a1.db')
-        self.cur = self.con.cursor()
+        # DB connection init
+        try:
+            osp = os.path.realpath(__file__)
+            bsp = os.path.basename(__file__)
+            relPath = osp.replace(bsp, "")
+            self.con = sqlite3.connect(relPath + 'a1.db')
+            self.cur = self.con.cursor()
+        except FileNotFoundError:
+            f = open("ErrorLog.txt", "a")
+            errorLog = " : Failed to load database  \n"
+            f.write(str(datetime.datetime.now)+errorLog)
+            f.close()
+            sys.exit(0)
         self.cur.execute('''CREATE TABLE IF NOT EXISTS 'pidata'
         ('temp'	REAL NOT NULL,'humid'
         REAL NOT NULL,'date'
@@ -57,18 +65,21 @@ class Dbcon():
         return self.cur, self.con
 
     def executeQuery(self, q, tmp, humid, date, time, notify):
+        # DB query execution for non result based queries
         self.cur, self.con = self.createCon()
         self.cur.execute(q, (tmp, humid, date, time, notify))
         self.con.commit()
         self.con.close()
 
     def updateQuery(self, q, dateNow):
+        # DB query execution for update queries
         self.cur, self.con = self.createCon()
         self.cur.execute(q, [dateNow])
         self.con.commit()
         self.con.close()
 
     def getRes(self, q, param):
+        # DB query execution for result based queries
         self.cur, self.con = self.createCon()
         self.cur.execute(q, [param])
         row = self.cur.fetchall()
@@ -79,6 +90,7 @@ class Dbcon():
 class pushBulletImp():
 
     def sendNotify(self, msg):
+        # pushBullet notify call for registerd devices
         apiKey = "o.2uIo9r0MKCCFX8Mv3uMhp4xOXE9vgBrC"
         p = PushBullet(apiKey)
         devices = p.getDevices()
@@ -92,11 +104,13 @@ class monitorTemp():
         self.notified = notified
 
     def get_cpu_temprature(self):
+        # temprature correction logic
         result = os.popen("vcgencmd measure_temp").readline()
         ct = float(result.replace("temp=", "").replace("'C\n", ""))
         return(ct)
 
     def checkTemp(self):
+        # temprature get and check
         tempTemp = sense.get_temperature_from_humidity()
         temp_cpu = self.get_cpu_temprature()
         temp_cor = tempTemp - ((temp_cpu - tempTemp) / 1.5)
@@ -111,14 +125,23 @@ class monitorTemp():
 class maindriver():
 
     def readJson(self):
-        osp = os.path.realpath(__file__)
-        bsp = os.path.basename(__file__)
-        relPath = osp.replace(bsp, "")
-        with open(relPath + 'config.json') as json_file:
-            data = json.load(json_file)
-            return data
+        # read config file
+        try:
+            osp = os.path.realpath(__file__)
+            bsp = os.path.basename(__file__)
+            relPath = osp.replace(bsp, "")
+            with open(relPath + 'config.json') as json_file:
+                data = json.load(json_file)
+                return data
+        except FileNotFoundError:
+            f = open("ErrorLog.txt", "a")
+            errorLog = " : Failed to load congif file  \n"
+            f.write(str(datetime.datetime.now)+errorLog)
+            f.close()
+            sys.exit(0)
 
     def getNotified(self):
+        # Check if notification sent
         q = "select * from pidata where date = ? limit 1 ;"
         nowDate = ((str(datetime.datetime.now())).split(" "))[0]
         dbCheckNotify = Dbcon()
@@ -129,6 +152,7 @@ class maindriver():
             return False
 
     def doNotify(self, msg):
+        # Send notification to registerd device
         updateDB = Dbcon()
         subQ = "(select ROWID from pidata where date = ? limit 1) ;"
         q = "UPDATE pidata SET notified=1 WHERE ROWID = " + subQ
@@ -138,6 +162,9 @@ class maindriver():
         myPB.sendNotify(msg)
 
     def collectStoreNotify(self, flag=False):
+        # Function to match values with config
+        # run queries
+        # populate database
         tmin = self.readJson()['min_temprature']
         tmax = self.readJson()['max_temprature']
         tobj = monitorTemp(tmax, tmin, 0)
@@ -152,6 +179,9 @@ class maindriver():
         tmp = tresp[0]
         humid = hresp[0]
         noti = 0
+
+        # conditions for temprature and humidity according to config.json
+
         if flag is True:
             cmnt = ""
 

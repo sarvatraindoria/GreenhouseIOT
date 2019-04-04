@@ -12,10 +12,13 @@ plot = fixImport().getPLT()
 
 class CreateAnalyticsScatter():
         def geberateScatter():
+                # DB connection and data retrival
                 conn = monitorAndNotify.Dbcon().createCon()[1]
                 que = 'select time,temp,humid from pidata'
                 data = pd.read_sql_query(que, conn)
                 time = data['time']
+
+                # data cleaning and formatting
                 range1 = (time >= "12") & (time < "14")
                 df1 = data[range1]
                 df1 = df1.assign(range="12-14")
@@ -34,6 +37,8 @@ class CreateAnalyticsScatter():
                 r3 = []
                 r4 = []
 
+                # Data sets creation
+
                 for index, row in df1.iterrows():
                         r1.append((row['temp'], row['humid']))
 
@@ -45,6 +50,8 @@ class CreateAnalyticsScatter():
 
                 for index, row in df4.iterrows():
                         r4.append((row['temp'], row['humid']))
+
+                # Chart config
 
                 xy_chart = pygal.XY(stroke=False)
                 xy_chart.title = 'Correlation'

@@ -13,7 +13,7 @@ from sense_hat import SenseHat
 
 
 class Blconnect():
- 
+
     def detect(self):
         while True:
             print("Scanning...")

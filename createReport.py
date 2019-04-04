@@ -4,34 +4,7 @@ import pandas as pd
 import os
 import json
 import collections
-
-
-class Dbcon():
-
-    def createCon(self):
-        self.con = sqlite3.connect('a1.db')
-        self.cur = self.con.cursor()
-        return self.cur, self.con
-
-    def executeQuery(self, q, tmp, humid, date, time, notify, cmnt, stat):
-        self.cur, self.con = self.createCon()
-        self.cur.execute(q, (tmp, humid, date, time, notify, cmnt, stat))
-        self.con.commit()
-        self.con.close()
-
-    def updateQuery(self, q, dateNow):
-        self.cur, self.con = self.createCon()
-        self.cur.execute(q, [dateNow])
-        self.con.commit()
-        self.con.close()
-
-    def getRes(self, q):
-        self.cur, self.con = self.createCon()
-        self.cur.execute(q)
-        rows = self.cur.fetchall()
-        cols = self.cur.column_names
-        self.con.close()
-        return rows, cols
+import monitorAndNotify
 
 
 class DataStoreT():
@@ -43,15 +16,7 @@ class DataStoreT():
 
 
 class readCheck():
-
-    def readJson(self):
-        osp = os.path.realpath(__file__)
-        bsp = os.path.basename(__file__)
-        relPath = osp.replace(bsp, "")
-        with open(relPath+'config.json') as json_file:
-            data = json.load(json_file)
-            return data
-
+    # check limit and return checker (-1, 0, 1)
     def chkLt(self, val, lowerLim, upperLim):
         if(val < lowerLim):
             return -1, lowerLim - val
@@ -62,12 +27,14 @@ class readCheck():
 
 
 class createReport():
+    # dump data to csv
     def exportCSV(self):
         dsl = {}
         dsl = collections.OrderedDict(dsl)
         csvData = []
-        myDB = Dbcon()
+        myDB = monitorAndNotify.Dbcon()
         cur, con = myDB.createCon()
+        # getting values from db
         df = pd.read_sql_query("""
                                 select date,min(temp),
                                 max(temp),min(humid),max(humid)
@@ -81,12 +48,12 @@ class createReport():
             dt = df['date'][row]
             dsl.update({dt: DataStoreT(mint, maxt, minh, maxh)})
             print(dt)
-
-        tmin = readCheck().readJson()['min_temprature']
-        tmax = readCheck().readJson()['max_temprature']
-        hmin = readCheck().readJson()['min_humidity']
-        hmax = readCheck().readJson()['max_humidity']
-        print("---")
+            tmin = monitorAndNotify.maindriver().readJson()['min_temprature']
+            tmax = monitorAndNotify.maindriver().readJson()['max_temprature']
+            hmin = monitorAndNotify.maindriver().readJson()['min_humidity']
+            hmax = monitorAndNotify.maindriver().readJson()['max_humidity']
+        # checking db values with config
+        # string formating for dynamic comment
         for i in dsl:
             status = "OK : "
             cmnt = ""
@@ -128,7 +95,7 @@ class createReport():
                 status = "BAD : "
 
             csvData.append([i, status + cmnt])
-
+        # csv dump
         df = pd.DataFrame(csvData, columns=['Date', 'Status'])
         df.to_csv("report.csv", sep=',', index=False)
 
