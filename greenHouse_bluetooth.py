@@ -5,7 +5,7 @@ from pushbullet.pushbullet import PushBullet
 import monitorAndNotify as util
 
 from sense_hat import SenseHat
-# apiKey = "o.UPscOoahFXH2SOglsP5MICsJSywOOlqr"
+# apiKey = "o.2uIo9r0MKCCFX8Mv3uMhp4xOXE9vgBrC"
 
 # Bluetooth class with scanning and SendMsg funstion
 
@@ -22,9 +22,9 @@ class Blconnect():
             for name in nearbyDevices:
                 print(name)
                 return name
-    # blueMSg Function will readjason file to store Boundry values of Temp and Humidity
-    # data var will store return msg from collectstoreNotify funtion called
-    # from maindriver class in monitorandnotify file
+    # blueMSg Function will readjason file to store Boundry values of
+    # Temp and Humidity data var will store return msg from collectstoreNotify
+    # funtion called from maindriver class in monitorandnotify file
 
     def blueMsg(self):
         data = util.maindriver().collectStoreNotify(True)
@@ -42,7 +42,7 @@ class Blconnect():
 # Connect funtion will use pushBullet apikey in order to use pushbullet library
 
     def connect(self):
-       
+
         apiKey = "o.2uIo9r0MKCCFX8Mv3uMhp4xOXE9vgBrC"
         p = PushBullet(apiKey)
         # Get a list of devices
