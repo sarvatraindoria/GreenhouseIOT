@@ -14,26 +14,27 @@ plot = fixImport().getPLT()
 
 
 class CreateAnalyticsBar():
-    def generateBar():
+    def generateBar(self):
         conn = monitorAndNotify.Dbcon().createCon()[1]
 
         data = pd.read_sql_query(
             '''SELECT date, MIN(temp), MAX(temp), MIN(humid),
                 MAX(humid) FROM pidata GROUP BY date''', conn)
         conn.close()
+        data["date"] = data["date"].str.slice(5, 10)
         data = pd.melt(
             data,
             id_vars="date",
             var_name="Attributes",
             value_name="Value")
-
-        sns.catplot(
+        cmnt = "and temprature by date"
+        ax = sns.catplot(
             x='date',
             y='Value',
             hue='Attributes',
             data=data,
             kind='bar')
-
+        ax.fig.suptitle('       minimum and maximum humidity ' + cmnt)
         plot.savefig('bar.png')
 
 CreateAnalyticsBar().generateBar()
