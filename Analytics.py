@@ -11,7 +11,7 @@ plot = fixImport().getPLT()
 
 
 class CreateAnalyticsScatter():
-        def geberateScatter():
+        def geberateScatter(self):
                 # DB connection and data retrival
                 conn = monitorAndNotify.Dbcon().createCon()[1]
                 que = 'select time,temp,humid from pidata'
@@ -54,12 +54,15 @@ class CreateAnalyticsScatter():
                 # Chart config
 
                 xy_chart = pygal.XY(stroke=False)
-                xy_chart.title = 'Correlation'
+                cmnt = 'between temrature and humidity at given time'
+                xy_chart.title = 'Plot representing relation ' + cmnt
                 xy_chart.add('12-14', r1)
                 xy_chart.add('14-16', r2)
                 xy_chart.add('16-18', r3)
                 xy_chart.add('18-20', r4)
                 xy_chart.show_legend = True
+                xy_chart.x_labels = 'Temprature'
+                xy_chart.y_labels = 'Humidity'
                 xy_chart.render_to_png('scatter.png')
 
 CreateAnalyticsScatter().geberateScatter()

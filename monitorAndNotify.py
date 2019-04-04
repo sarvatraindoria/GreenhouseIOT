@@ -18,6 +18,8 @@ class Humid():
     def humidity(self):
         # Humidity data collection and check
         humid = round(sense.get_humidity())
+        if humid <= 0:
+            sys.exit() 
         checker = 0
         try:
             if humid > self.maxHumid:
