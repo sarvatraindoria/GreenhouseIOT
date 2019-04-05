@@ -1,17 +1,20 @@
 
+**Analytics Report**
+
+#Summary
 
 From the ten most popular data visualisation libraries of Python we short listed Seaborn and Pygal.We finlaised the 
-one which has most efficient online support.
+ones which has most efficient online support and documentation.
 We used two different visualization represntation: Scatter plot and Barplot. 
 
-- Scatter Plot using PyGal Library 
-Humidity with respect to temperature (humidity y-axis & temperature x-axis). 
+#Scatter Plot using PyGal Library. 
+Pygal is popular for plotting svg charts on webpages and its implementation is simple. We plotted humidity with respect to temperature (humidity y-axis & temperature x-axis). 
 We used 4 different time block colour code Red(12-13:59),Violet(14-15:59),Cyan(16-17:59),Orange(18-19:59)
-This will visually reflect our data time span  
+This will visually reflect our data time span. We wanted to analyse humidity and temperature on a specific given time slot of the day 
 
 
-- Barplot using Seaborn
+#Barplot using Seaborn
 For Barplot visualization we used Seaborn wrapper library built on matplotlib.
 Matplotlib was the first Python data visualization library .It is highly influenced by matlab hence the title MatPlotlib .
 MatPlotlib was complex and with long syntex which is why industry came up with wrappers libraries like pandas and Seaborn.
-Graph plots min/max values of temperature and humidty with respect to date
+Graph plots minimum and maximum values of temperature and humidty with respect to date
